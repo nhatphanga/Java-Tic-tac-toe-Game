@@ -1,0 +1,195 @@
+package tic.tac.toe;
+
+import java.util.Random;
+
+public class AI {
+
+
+public static Random random = new Random();
+public static boolean found = false;
+public static boolean AIFirst = false;
+public static int chance;
+
+// checking the boxes if they are the same as the xo char it needs to check
+public static boolean checkForAI(int i1, int j1, int i2, int j2, char xo)
+{
+    if (  ( Game.moves[i1][j1] == Game.moves[i2][j2]) && (Game.moves[i1][j1] == xo )  )
+      return true;
+    else
+      return false;
+}
+
+public static int[] getRandomIJ()   // get random location for the AI in case it can play any available square
+{
+	int i = 0;
+    int j = 0;
+    
+  do
+  {
+	  i = random.nextInt(3)+1;
+	  j = random.nextInt(3)+1;
+    if ( Game.moves[i][j] == 'e')
+    {
+    	found = true;
+    }
+  } while (found == false);
+  return new int[] {i,j};
+}
+
+// Notice for Ethan, you need to remember to reset AIFirst to false when someone wins,  null in case of no AI
+public static int[] findIJ( int diff)
+{
+  found = false; //reset found to false
+ /* if ((x == -1) || (y == -1))  // -1 value will be implied that AI will play first and this is the first move
+  {
+    AIFirst = true;
+    return getRandomIJ();
+  } */
+
+  if (found == false)
+  {
+    chance = random.nextInt(10);
+    if (chance > diff)  // is the chance number is out of the probability range, AI will generate a random
+    {
+      return getRandomIJ();
+    }
+  }
+  
+  return getIJ();
+}
+
+
+
+
+	public static int[] getIJ() {
+		if (AIFirst) { 
+			char xo = 'x';
+			int xoReturn[] = loopIJ(xo);
+			if (xoReturn[0] == -1) {
+				xo = 'o';
+				int xoReturn2[] = loopIJ(xo);
+				if (xoReturn2[0] != -1)
+					return new int[] {xoReturn2[0], xoReturn2[1]};
+			}
+			else
+				return new int[] {xoReturn[0], xoReturn[1]};   
+		}
+		else  if (AIFirst == false){ 
+			char xo = 'o';
+			int xoReturn[] = loopIJ( xo);
+			if (xoReturn[0] == -1) {
+				xo = 'x';
+				int xoReturn2[] = loopIJ( xo);
+				if (xoReturn2[0] != -1)
+					return new int[] {xoReturn2[0], xoReturn2[1]};
+			}
+			else
+				return new int[] {xoReturn[0], xoReturn[1]};   	  
+		}
+		return getRandomIJ(); 
+	} 
+
+  public static int[] loopIJ( char xo) {
+	  
+	  if (Game.getMoves() == 1 || Game.getMoves() == 2 ) { //for advance AI
+		  int i = 0;
+		  int j = 0;		    
+		  do
+		  {
+			  i = random.nextInt(3)+1;
+			  j = random.nextInt(3)+1;
+			  if (i%2 == 1 && j%2 == 1) {
+				  if ( Game.moves[i][j] == 'e') {
+					  found = true;
+					  Game.print("Random " + i + j, false);
+				  }
+			  } 
+		  } while (found == false);
+		  return new int[] {i,j};
+	  }
+	  
+	  for (int i = 1; i<3;i++) {
+		  for (int j = 1; j<3;j++) {			 
+			  if (checkForAI(i,j,i,j+1,xo)) {  //horizontal check
+				  if (Game.moves[i][j+2] == 'e') {
+					  found = true;
+					  return new int[] {i,j+2};
+				  }
+				  else if (Game.moves[i][j-1] == 'e') {
+					  found = true;
+					  return new int[] {i,j-1};
+				  }
+			  }
+
+			  if (checkForAI(i,j,i+1,j,xo)) { //vertical check	
+				  if (Game.moves[i+2][j] == 'e') {
+					  found = true;
+					  return new int[] {i+2,j};
+				  }
+				  else if (Game.moves[i-1][j] == 'e') {
+					  found = true;
+					  return new int[] {i-1,j};
+				  }
+			  }
+
+			  if (checkForAI(i,j,i+1,j+1,xo)) { //diagonal top down check
+				  if (Game.moves[i+2][j+2] == 'e') {					  
+					  found = true;
+					  return new int[] {i+2,j+2};
+				  }
+				  else if (Game.moves[i-1][j-1] == 'e') {					  
+					  found = true;
+					  return new int[] {i-1,j-1};
+				  }
+			  }
+			  
+			  if (checkForAI(i,j,i-1,j+1,xo)) { //diagonal bottom up check
+				  if (Game.moves[i-2][j+2] == 'e') {
+					  found = true;
+					  return new int[] {i+2,j+2};
+				  }
+				  else if (Game.moves[i+1][j-1] == 'e') {
+					  found = true;
+					  return new int[] {i+1,j-1};
+				  }
+			  }
+			  if (i == 1) {
+				  if (checkForAI(i,j,i,j+2,xo)) {  //horizontal jump check 
+					  if (Game.moves[i][j+1] == 'e') {
+						  found = true;
+						  return new int[] {i,j+1};
+					  }
+				  }
+			  }
+			  if (j == 1) {
+				  if (checkForAI(i,j,i+2,j,xo)) { //vertical jump check	
+					  if (Game.moves[i+1][j] == 'e') {
+						  found = true;
+						  return new int[] {i+1,j};
+					  }
+				  }
+			  }
+			  
+			  if (i == 1 && j ==1) {
+				  if (checkForAI(i,j,i+2,j+2,xo)) { //diagonal top down jump check
+					  if (Game.moves[i+1][j+1] == 'e') {					  
+						  found = true;
+						  return new int[] {i+1,j+1};
+					  }
+				  }
+			  }
+			  if (i == 1 && j == 3) {
+				  if (checkForAI(i,j,i-2,j+2,xo)) { //diagonal bottom up jump check
+					  if (Game.moves[i-1][j+1] == 'e') {
+						  found = true;
+						  return new int[] {i-1,j+1};
+					  }
+				  }
+			  }
+			  
+		  }
+	  }
+	  return new int[] {-1,-5};
+  }
+  
+}
